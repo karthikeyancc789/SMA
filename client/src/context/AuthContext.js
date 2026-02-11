@@ -1,4 +1,3 @@
 import { createContext } from 'react';
-
-// This file only exports the context object to satisfy ESLint
+// This file only creates the context object
 export const AuthContext = createContext(null);
