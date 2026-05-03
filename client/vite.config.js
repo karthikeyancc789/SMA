@@ -8,7 +8,14 @@ export default defineConfig({
       // Disable fast refresh warnings
       fastRefresh: false
     })
-  ]
+  ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
+  }
 })
-
-

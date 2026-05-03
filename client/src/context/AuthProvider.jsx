@@ -54,15 +54,45 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const register = useCallback(async (userData) => {
+    try {
+      // Convert year to number and ensure all required fields
+      const dataToSend = {
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+        department: userData.department,
+        year: parseInt(userData.year),
+        role: userData.role || 'student',
+        rollNumber: userData.rollNumber || ''
+      };
+      
+      console.log('Sending registration data:', dataToSend);
+      
+      const { data } = await axios.post('/api/auth/register', dataToSend);
+      localStorage.setItem('token', data.token);
+      setToken(data.token);
+      setUser(data);
+      return { success: true, data };
+    } catch (error) {
+      console.error('Registration error:', error.response?.data || error);
+      return { 
+        success: false, 
+        error: error.response?.data?.message || error.message || 'Registration failed' 
+      };
+    }
+  }, []);
+
   const value = useMemo(() => ({
     user,
     token,
     loading,
     login,
+    register,
     logout,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin'
-  }), [user, token, loading, logout]);
+  }), [user, token, loading, logout, register]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
