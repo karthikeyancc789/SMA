@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from '../context/useAuth';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 const AttendanceReport = () => {
   const [report, setReport] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { token } = useAuth();
+  const { token } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchAttendance = async () => {

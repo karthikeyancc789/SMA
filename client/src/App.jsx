@@ -1,6 +1,6 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthProvider";
-import { useAuth } from "./context/useAuth";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useContext } from 'react';
+import { AuthContext } from './context/AuthContext';
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
@@ -12,7 +12,7 @@ import ScanQR from "./pages/ScanQR";
 import AttendanceReport from "./pages/AttendanceReport";
 
 const HomePage = () => {
-  const { user, loading } = useAuth();
+  const { user, loading } = useContext(AuthContext);  // ✅ Fixed - removed ()
 
   if (loading) {
     return (
@@ -23,98 +23,58 @@ const HomePage = () => {
   }
 
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
-  if (user.role === "admin") {
-    return <Navigate to="/admin/dashboard" />;
-  }
-
-  return <Navigate to="/student/dashboard" />;
+  return user.role === "admin" 
+    ? <Navigate to="/admin/dashboard" replace /> 
+    : <Navigate to="/student/dashboard" replace />;
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-          <Navbar />
-          <div style={{ flex: 1 }}>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <Navbar />
+      <div style={{ flex: 1 }}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<HomePage />} />
 
-              {/* Home Route */}
-              <Route path="/" element={<HomePage />} />
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute role="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/admin/generate-qr" element={
+            <ProtectedRoute role="admin">
+              <GenerateQR />
+            </ProtectedRoute>
+          } />
 
-              {/* Admin Routes */}
-              <Route
-                path="/admin/dashboard"
-                element={
-                  <ProtectedRoute role="admin">
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/generate-qr"
-                element={
-                  <ProtectedRoute role="admin">
-                    <GenerateQR />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/classes"
-                element={
-                  <ProtectedRoute role="admin">
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/reports"
-                element={
-                  <ProtectedRoute role="admin">
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                }
-              />
+          <Route path="/student/dashboard" element={
+            <ProtectedRoute role="student">
+              <StudentDashboard />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/student/scan" element={
+            <ProtectedRoute role="student">
+              <ScanQR />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/student/attendance" element={
+            <ProtectedRoute role="student">
+              <AttendanceReport />
+            </ProtectedRoute>
+          } />
 
-              {/* Student Routes */}
-              <Route
-                path="/student/dashboard"
-                element={
-                  <ProtectedRoute role="student">
-                    <StudentDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/student/scan"
-                element={
-                  <ProtectedRoute role="student">
-                    <ScanQR />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/student/attendance"
-                element={
-                  <ProtectedRoute role="student">
-                    <AttendanceReport />
-                  </ProtectedRoute>
-                }
-              />
-
-              {/* Fallback */}
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </div>
-        </div>
-      </Router>
-    </AuthProvider>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    </div>
   );
 }
 

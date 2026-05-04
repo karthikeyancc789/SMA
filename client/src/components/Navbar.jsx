@@ -1,8 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/useAuth';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 const Navbar = () => {
-  const { user, logout, isAdmin, isStudent } = useAuth();
+  const { user, logout, isAdmin, isStudent } = useContext(AuthContext);  // ✅ Fixed
   const navigate = useNavigate();
 
   const handleLogout = () => {

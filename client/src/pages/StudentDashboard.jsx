@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/useAuth';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 import attendanceService from '../services/attendanceService';
 import classService from '../services/classService';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import toast, { Toaster } from 'react-hot-toast';
 
 const StudentDashboard = () => {
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [classes, setClasses] = useState([]);
