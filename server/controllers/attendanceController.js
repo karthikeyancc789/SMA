@@ -170,7 +170,7 @@ const getClassAttendance = async (req, res) => {
     const { startDate, endDate } = req.query;
 
     // Verify class exists and user is faculty
-    const classData = await Class.findById(classId).populate('students', 'name rollNumber email');
+    const classData = await Class.findById(classId).populate('students', 'name rollNumber email department');
     
     if (!classData) {
       return res.status(404).json({ message: 'Class not found' });
@@ -188,9 +188,45 @@ const getClassAttendance = async (req, res) => {
       if (endDate) query.createdAt.$lte = new Date(endDate);
     }
 
-    const attendance = await Attendance.find(query)
-      .populate('student', 'name rollNumber email')
-      .sort('-createdAt');
+    // Get all attendance logs for the class in the date range
+    const attendanceLogs = await Attendance.find(query);
+
+    // Calculate total sessions held (by counting unique qrSession object IDs in the logs)
+    const uniqueSessions = new Set(attendanceLogs.map(log => log.qrSession.toString()));
+    const totalSessions = uniqueSessions.size;
+
+    let totalPresentOverall = 0;
+    let totalPercentageOverall = 0;
+
+    // Aggregate attendance per enrolled student
+    const aggregatedAttendance = classData.students.map(student => {
+      const studentLogs = attendanceLogs.filter(
+        log => log.student.toString() === student._id.toString()
+      );
+      
+      const presentCount = studentLogs.filter(log => log.status === 'present').length;
+      const absentCount = totalSessions - presentCount;
+      const percentage = totalSessions > 0 ? (presentCount / totalSessions) * 100 : 0;
+
+      totalPresentOverall += presentCount;
+      totalPercentageOverall += percentage;
+
+      return {
+        student: {
+          name: student.name,
+          rollNumber: student.rollNumber,
+          department: student.department || 'N/A'
+        },
+        totalClasses: totalSessions,
+        present: presentCount,
+        absent: Math.max(0, absentCount),
+        percentage: percentage
+      };
+    });
+
+    const totalStudents = classData.students.length;
+    const totalAbsentOverall = (totalStudents * totalSessions) - totalPresentOverall;
+    const averagePercentage = totalStudents > 0 ? totalPercentageOverall / totalStudents : 0;
 
     res.json({
       classInfo: {
@@ -198,7 +234,13 @@ const getClassAttendance = async (req, res) => {
         subject: classData.subject,
         totalStudents: classData.students.length
       },
-      attendance
+      stats: {
+        totalStudents,
+        totalPresent: totalPresentOverall,
+        totalAbsent: Math.max(0, totalAbsentOverall),
+        averagePercentage
+      },
+      attendance: aggregatedAttendance
     });
   } catch (error) {
     console.error('Get Class Attendance Error:', error);

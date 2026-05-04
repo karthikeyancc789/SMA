@@ -9,7 +9,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import GenerateQR from "./pages/QRGenerate";
 import ScanQR from "./pages/ScanQR";
+import AdminClasses from "./pages/AdminClasses";
 import AttendanceReport from "./pages/AttendanceReport";
+import AdminReports from "./pages/AdminReports";
 
 const HomePage = () => {
   const { user, loading } = useContext(AuthContext);  // ✅ Fixed - removed ()
@@ -26,8 +28,8 @@ const HomePage = () => {
     return <Navigate to="/login" replace />;
   }
 
-  return user.role === "admin" 
-    ? <Navigate to="/admin/dashboard" replace /> 
+  return user.role === "admin"
+    ? <Navigate to="/admin/dashboard" replace />
     : <Navigate to="/student/dashboard" replace />;
 };
 
@@ -46,10 +48,22 @@ function App() {
               <AdminDashboard />
             </ProtectedRoute>
           } />
-          
+
           <Route path="/admin/generate-qr" element={
             <ProtectedRoute role="admin">
               <GenerateQR />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin/classes" element={
+            <ProtectedRoute role="admin">
+              <AdminClasses />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin/reports" element={
+            <ProtectedRoute role="admin">
+              <AdminReports />
             </ProtectedRoute>
           } />
 
@@ -58,13 +72,13 @@ function App() {
               <StudentDashboard />
             </ProtectedRoute>
           } />
-          
+
           <Route path="/student/scan" element={
             <ProtectedRoute role="student">
               <ScanQR />
             </ProtectedRoute>
           } />
-          
+
           <Route path="/student/attendance" element={
             <ProtectedRoute role="student">
               <AttendanceReport />

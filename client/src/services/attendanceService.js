@@ -1,17 +1,35 @@
-import axios from "axios";
+import api from './api';
 
-const API_URL = "http://localhost:5000/api/attendance";
+const attendanceService = {
+  markAttendance: async (sessionToken, location, deviceInfo) => {
+    const response = await api.post('/attendance/mark', {
+      sessionToken,
+      location,
+      deviceInfo
+    });
+    return response.data;
+  },
 
-const markAttendance = async (sessionToken, location, deviceInfo) => {
-  const response = await axios.post(`${API_URL}/mark`, {
-    sessionToken,
-    location,
-    deviceInfo
-  });
+  getStudentAttendance: async () => {
+    const response = await api.get('/attendance/student');
+    return response.data;
+  },
 
-  return response.data;
+  getClassAttendance: async (classId, dateRange) => {
+    const params = new URLSearchParams();
+    if (dateRange?.startDate) params.append('startDate', dateRange.startDate);
+    if (dateRange?.endDate) params.append('endDate', dateRange.endDate);
+    
+    const queryString = params.toString();
+    const url = `/attendance/class/${classId}${queryString ? `?${queryString}` : ''}`;
+    const response = await api.get(url);
+    return response.data;
+  },
+
+  getAttendanceStats: async () => {
+    const response = await api.get('/attendance/stats');
+    return response.data;
+  }
 };
 
-export default {
-  markAttendance
-};
+export default attendanceService;

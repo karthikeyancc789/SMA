@@ -19,10 +19,10 @@ const ScanQR = () => {
     try {
       // Validate QR code
       const _qrValidation = await qrService.validateQR(sessionToken);
-      
+
       // Get current location
       const location = await getCurrentLocation();
-      
+
       // Get device info
       const deviceInfo = {
         userAgent: navigator.userAgent,
@@ -36,10 +36,9 @@ const ScanQR = () => {
         deviceInfo
       );
 
-
       setSuccess(true);
       toast.success('Attendance marked successfully!');
-      
+
       setTimeout(() => {
         navigate('/student/dashboard');
       }, 2000);
@@ -57,34 +56,30 @@ const ScanQR = () => {
   };
 
   return (
-    <div className="container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+    <div style={styles.pageContainer}>
       <Toaster position="top-right" />
-      
-      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <div className="card">
-          <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '8px', textAlign: 'center' }}>
-            Scan QR Code
-          </h1>
-          <p style={{ color: '#6b7280', marginBottom: '24px', textAlign: 'center' }}>
+
+      <div style={styles.contentWrapper}>
+        <div style={styles.card}>
+          <h1 style={styles.title}>Scan QR Code</h1>
+          <p style={styles.subtitle}>
             Scan the QR code displayed by your instructor
           </p>
 
           {validating && (
-            <div className="text-center" style={{ padding: '40px' }}>
-              <div className="spinner"></div>
-              <p style={{ marginTop: '16px', color: '#6b7280' }}>
+            <div style={styles.stateContainer}>
+              <div style={styles.spinner}></div>
+              <p style={styles.stateText}>
                 Validating and marking attendance...
               </p>
             </div>
           )}
 
           {success && (
-            <div className="text-center" style={{ padding: '40px' }}>
-              <div style={{ fontSize: '64px', marginBottom: '16px' }}>✅</div>
-              <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>
-                Success!
-              </h2>
-              <p style={{ color: '#6b7280' }}>
+            <div style={styles.stateContainer}>
+              <div style={styles.successIcon}>✅</div>
+              <h2 style={styles.successTitle}>Success!</h2>
+              <p style={styles.stateText}>
                 Your attendance has been marked
               </p>
             </div>
@@ -92,11 +87,13 @@ const ScanQR = () => {
 
           {scanning && !validating && !success && (
             <>
-              <QRScanner onScan={handleScan} onError={handleError} />
-              
-              <div className="alert alert-info mt-3">
-                <strong>📱 Instructions:</strong>
-                <ul style={{ marginTop: '8px', marginLeft: '20px', fontSize: '14px' }}>
+              <div style={styles.scannerWrapper}>
+                <QRScanner onScan={handleScan} onError={handleError} />
+              </div>
+
+              <div style={styles.alertBox}>
+                <strong style={styles.alertTitle}>📱 Instructions:</strong>
+                <ul style={styles.alertList}>
                   <li>Allow camera access when prompted</li>
                   <li>Point your camera at the QR code</li>
                   <li>Keep steady until it's scanned</li>
@@ -106,10 +103,18 @@ const ScanQR = () => {
             </>
           )}
 
-          <div className="text-center mt-3">
-            <button 
-              className="btn btn-outline"
+          <div style={styles.buttonContainer}>
+            <button
+              style={styles.outlineButton}
               onClick={() => navigate('/student/dashboard')}
+              onMouseEnter={(e) => {
+                e.target.style.background = '#4f46e5';
+                e.target.style.color = 'white';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'white';
+                e.target.style.color = '#4f46e5';
+              }}
             >
               Back to Dashboard
             </button>
@@ -118,6 +123,112 @@ const ScanQR = () => {
       </div>
     </div>
   );
+};
+
+const styles = {
+  pageContainer: {
+    minHeight: '100vh',
+    background: '#f9fafb',
+    padding: '40px 20px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  contentWrapper: {
+    width: '100%',
+    maxWidth: '600px',
+    marginTop: '20px',
+  },
+  card: {
+    background: 'white',
+    borderRadius: '16px',
+    padding: '32px',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+  },
+  title: {
+    fontSize: '28px',
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: '8px',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: '16px',
+    color: '#6b7280',
+    marginBottom: '32px',
+    textAlign: 'center',
+  },
+  stateContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '40px 20px',
+  },
+  spinner: {
+    width: '50px',
+    height: '50px',
+    border: '4px solid #e5e7eb',
+    borderTop: '4px solid #4f46e5',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
+  },
+  stateText: {
+    marginTop: '16px',
+    color: '#6b7280',
+    fontSize: '16px',
+  },
+  successIcon: {
+    fontSize: '64px',
+    marginBottom: '16px',
+  },
+  successTitle: {
+    fontSize: '24px',
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: '8px',
+  },
+  scannerWrapper: {
+    borderRadius: '12px',
+    overflow: 'hidden',
+    border: '2px solid #e5e7eb',
+    marginBottom: '24px',
+  },
+  alertBox: {
+    background: '#eff6ff',
+    borderRadius: '12px',
+    padding: '20px',
+    marginTop: '24px',
+    border: '1px solid #bfdbfe',
+  },
+  alertTitle: {
+    color: '#1e40af',
+    fontSize: '16px',
+    display: 'block',
+    marginBottom: '12px',
+  },
+  alertList: {
+    margin: 0,
+    paddingLeft: '24px',
+    color: '#1e3a8a',
+    fontSize: '14px',
+    lineHeight: '1.6',
+  },
+  buttonContainer: {
+    textAlign: 'center',
+    marginTop: '32px',
+  },
+  outlineButton: {
+    background: 'white',
+    color: '#4f46e5',
+    border: '2px solid #4f46e5',
+    borderRadius: '12px',
+    padding: '12px 24px',
+    fontSize: '16px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+  },
 };
 
 export default ScanQR;

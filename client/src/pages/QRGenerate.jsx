@@ -38,9 +38,9 @@ const QRGenerate = () => {
     try {
       const { classes } = await classService.getFacultyClasses();
       setClasses(classes);
-    }catch (error) {
-        console.error(error);
-        toast.error('Failed to load classes');
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to load classes');
     }
   };
 
@@ -74,7 +74,7 @@ const QRGenerate = () => {
         };
       }
 
-      const data = await qrService.QRGenerate(
+      const data = await qrService.generateQR(
         formData.classId,
         Number(formData.expiryMinutes),
         location
@@ -96,65 +96,60 @@ const QRGenerate = () => {
 
   if (qrData) {
     return (
-      <div className="container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+      <div style={styles.pageContainer}>
         <Toaster position="top-right" />
-        
-        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-          <div className="card text-center">
-            <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '8px' }}>
-              QR Code Generated
-            </h1>
-            <p style={{ color: '#6b7280', marginBottom: '24px' }}>
+
+        <div style={styles.contentWrapper}>
+          <div style={{ ...styles.card, textAlign: 'center' }}>
+            <h1 style={styles.title}>QR Code Generated</h1>
+            <p style={styles.subtitle}>
               {qrData.classInfo.className} - {qrData.classInfo.subject}
             </p>
 
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'center', 
-              marginBottom: '24px',
-              padding: '20px',
-              background: '#f9fafb',
-              borderRadius: '12px'
-            }}>
-              <img 
-                src={qrData.qrSession.qrCodeImage} 
-                alt="QR Code" 
-                style={{ maxWidth: '300px', width: '100%' }}
+            <div style={styles.qrImageContainer}>
+              <img
+                src={qrData.qrSession.qrCodeImage}
+                alt="QR Code"
+                style={styles.qrImage}
               />
             </div>
 
-            <div className="alert alert-warning mb-3">
+            <div style={styles.alertWarning}>
               <strong>⏱️ Expires in: {timeRemaining}</strong>
             </div>
 
-            <div style={{ 
-              textAlign: 'left', 
-              padding: '16px', 
-              background: '#f9fafb', 
-              borderRadius: '8px',
-              marginBottom: '24px'
-            }}>
-              <p style={{ fontSize: '14px', marginBottom: '8px' }}>
+            <div style={styles.sessionInfoBox}>
+              <p style={styles.infoText}>
                 <strong>Session ID:</strong> {qrData.qrSession._id}
               </p>
-              <p style={{ fontSize: '14px', marginBottom: '8px' }}>
+              <p style={styles.infoText}>
                 <strong>Expires At:</strong> {new Date(qrData.qrSession.expiresAt).toLocaleString()}
               </p>
-              <p style={{ fontSize: '14px' }}>
-                <strong>Status:</strong> <span className="badge badge-success">Active</span>
+              <p style={{ ...styles.infoText, marginBottom: 0 }}>
+                <strong>Status:</strong> <span style={styles.badgeSuccess}>Active</span>
               </p>
             </div>
 
-            <div className="flex gap-2" style={{ justifyContent: 'center' }}>
-              <button 
-                className="btn btn-primary"
+            <div style={styles.buttonGroup}>
+              <button
+                style={styles.primaryButton}
                 onClick={handleNewQR}
+                onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
               >
                 Generate New QR
               </button>
-              <button 
-                className="btn btn-outline"
+              <button
+                style={styles.outlineButton}
                 onClick={() => navigate('/admin/dashboard')}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#4f46e5';
+                  e.target.style.color = 'white';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'white';
+                  e.target.style.color = '#4f46e5';
+                }}
               >
                 Back to Dashboard
               </button>
@@ -166,26 +161,27 @@ const QRGenerate = () => {
   }
 
   return (
-    <div className="container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+    <div style={styles.pageContainer}>
       <Toaster position="top-right" />
-      
-      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <div className="card">
-          <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px' }}>
-            Generate QR Code for Attendance
-          </h1>
+
+      <div style={styles.contentWrapper}>
+        <div style={styles.card}>
+          <h1 style={styles.title}>Generate QR Code</h1>
+          <p style={styles.subtitle}>Create a new attendance session</p>
 
           <form onSubmit={handleGenerate}>
-            <div className="form-group">
-              <label className="form-label">Select Class</label>
+            <div style={styles.formGroup}>
+              <label style={styles.formLabel}>Select Class</label>
               <select
                 name="classId"
-                className="form-control"
+                style={styles.formControl}
                 value={formData.classId}
                 onChange={handleChange}
                 required
               >
                 <option value="">Choose a class...</option>
+
+                {/* Dynamic mapped options from the database */}
                 {classes.map((cls) => (
                   <option key={cls._id} value={cls._id}>
                     {cls.className} - {cls.subject}
@@ -194,56 +190,56 @@ const QRGenerate = () => {
               </select>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">QR Code Expiry (minutes)</label>
+            <div style={styles.formGroup}>
+              <label style={styles.formLabel}>QR Code Expiry (minutes)</label>
               <input
                 type="number"
                 name="expiryMinutes"
-                className="form-control"
+                style={styles.formControl}
                 value={formData.expiryMinutes}
                 onChange={handleChange}
                 min="1"
                 max="60"
                 required
               />
-              <small style={{ color: '#6b7280', fontSize: '12px' }}>
+              <small style={styles.helperText}>
                 How long should the QR code remain valid?
               </small>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Location Settings</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <div style={styles.formGroup}>
+              <label style={styles.formLabel}>Location Settings</label>
+              <div style={styles.checkboxContainer}>
                 <input
                   type="checkbox"
                   name="useCurrentLocation"
                   checked={formData.useCurrentLocation}
                   onChange={handleChange}
-                  style={{ width: 'auto' }}
+                  style={styles.checkbox}
                 />
-                <span>Use my current location</span>
+                <span style={styles.checkboxLabel}>Use my current location</span>
               </div>
 
               {!formData.useCurrentLocation && (
-                <div className="grid grid-2">
-                  <div className="form-group">
-                    <label className="form-label">Latitude</label>
+                <div style={styles.grid2}>
+                  <div style={styles.subFormGroup}>
+                    <label style={styles.formLabel}>Latitude</label>
                     <input
                       type="number"
                       name="latitude"
-                      className="form-control"
+                      style={styles.formControl}
                       value={formData.latitude}
                       onChange={handleChange}
                       step="any"
                       required={!formData.useCurrentLocation}
                     />
                   </div>
-                  <div className="form-group">
-                    <label className="form-label">Longitude</label>
+                  <div style={styles.subFormGroup}>
+                    <label style={styles.formLabel}>Longitude</label>
                     <input
                       type="number"
                       name="longitude"
-                      className="form-control"
+                      style={styles.formControl}
                       value={formData.longitude}
                       onChange={handleChange}
                       step="any"
@@ -253,37 +249,46 @@ const QRGenerate = () => {
                 </div>
               )}
 
-              <div className="form-group">
-                <label className="form-label">Allowed Radius (meters)</label>
+              <div style={{ ...styles.formGroup, marginTop: '16px' }}>
+                <label style={styles.formLabel}>Allowed Radius (meters)</label>
                 <input
                   type="number"
                   name="radius"
-                  className="form-control"
+                  style={styles.formControl}
                   value={formData.radius}
                   onChange={handleChange}
                   min="10"
                   max="1000"
                   required
                 />
-                <small style={{ color: '#6b7280', fontSize: '12px' }}>
+                <small style={styles.helperText}>
                   Students must be within this distance to mark attendance
                 </small>
               </div>
             </div>
 
-            <div className="flex gap-2">
-              <button 
-                type="submit" 
-                className="btn btn-primary"
+            <div style={styles.buttonGroup}>
+              <button
+                type="submit"
+                style={{ ...styles.primaryButton, flex: 1 }}
                 disabled={loading}
-                style={{ flex: 1 }}
+                onMouseEnter={(e) => { if (!loading) e.target.style.transform = 'translateY(-2px)'; }}
+                onMouseLeave={(e) => { if (!loading) e.target.style.transform = 'translateY(0)'; }}
               >
                 {loading ? 'Generating...' : '📱 Generate QR Code'}
               </button>
-              <button 
+              <button
                 type="button"
-                className="btn btn-outline"
+                style={styles.outlineButton}
                 onClick={() => navigate('/admin/dashboard')}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#4f46e5';
+                  e.target.style.color = 'white';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'white';
+                  e.target.style.color = '#4f46e5';
+                }}
               >
                 Cancel
               </button>
@@ -293,6 +298,176 @@ const QRGenerate = () => {
       </div>
     </div>
   );
+};
+
+const styles = {
+  pageContainer: {
+    minHeight: '100vh',
+    background: '#f9fafb',
+    padding: '40px 20px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  contentWrapper: {
+    width: '100%',
+    maxWidth: '600px',
+    marginTop: '20px',
+  },
+  card: {
+    background: 'white',
+    borderRadius: '16px',
+    padding: '32px',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+  },
+  title: {
+    fontSize: '28px',
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: '8px',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: '16px',
+    color: '#6b7280',
+    marginBottom: '32px',
+    textAlign: 'center',
+  },
+  formGroup: {
+    marginBottom: '24px',
+  },
+  subFormGroup: {
+    marginBottom: '0',
+  },
+  formLabel: {
+    display: 'block',
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: '8px',
+  },
+  formControl: {
+    width: '100%',
+    padding: '12px 16px',
+    borderRadius: '10px',
+    border: '1px solid #d1d5db',
+    fontSize: '16px',
+    color: '#111827',
+    background: '#fff',
+    transition: 'border-color 0.2s ease',
+    outline: 'none',
+    boxSizing: 'border-box',
+  },
+  helperText: {
+    display: 'block',
+    color: '#6b7280',
+    fontSize: '13px',
+    marginTop: '6px',
+  },
+  checkboxContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    marginBottom: '16px',
+    padding: '12px',
+    background: '#f9fafb',
+    borderRadius: '8px',
+    border: '1px solid #e5e7eb',
+  },
+  checkbox: {
+    width: '18px',
+    height: '18px',
+    cursor: 'pointer',
+    accentColor: '#4f46e5',
+  },
+  checkboxLabel: {
+    fontSize: '15px',
+    color: '#374151',
+    cursor: 'pointer',
+  },
+  grid2: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '16px',
+  },
+  buttonGroup: {
+    display: 'flex',
+    gap: '12px',
+    justifyContent: 'center',
+    marginTop: '32px',
+  },
+  primaryButton: {
+    background: '#4f46e5',
+    color: 'white',
+    border: 'none',
+    borderRadius: '12px',
+    padding: '14px 24px',
+    fontSize: '16px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)',
+  },
+  outlineButton: {
+    background: 'white',
+    color: '#4f46e5',
+    border: '2px solid #4f46e5',
+    borderRadius: '12px',
+    padding: '14px 24px',
+    fontSize: '16px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+  },
+  qrImageContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: '24px',
+    padding: '24px',
+    background: '#f9fafb',
+    borderRadius: '16px',
+    border: '2px dashed #e5e7eb',
+  },
+  qrImage: {
+    maxWidth: '250px',
+    width: '100%',
+    height: 'auto',
+  },
+  alertWarning: {
+    background: '#fffbeb',
+    color: '#b45309',
+    padding: '12px 20px',
+    borderRadius: '10px',
+    border: '1px solid #fde68a',
+    marginBottom: '24px',
+    fontSize: '15px',
+  },
+  sessionInfoBox: {
+    textAlign: 'left',
+    padding: '20px',
+    background: '#f9fafb',
+    borderRadius: '12px',
+    border: '1px solid #e5e7eb',
+    marginBottom: '32px',
+  },
+  infoText: {
+    fontSize: '14px',
+    color: '#4b5563',
+    marginBottom: '12px',
+  },
+  badgeSuccess: {
+    background: '#dcfce7',
+    color: '#166534',
+    padding: '4px 12px',
+    borderRadius: '9999px',
+    fontSize: '12px',
+    fontWeight: '600',
+    display: 'inline-block',
+  },
 };
 
 export default QRGenerate;

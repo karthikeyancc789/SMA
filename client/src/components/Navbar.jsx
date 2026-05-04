@@ -20,13 +20,13 @@ const Navbar = () => {
 
         {user && (
           <div style={styles.navLinks}>
-            <Link 
-              to={isAdmin ? '/admin/dashboard' : '/student/dashboard'} 
+            <Link
+              to={isAdmin ? '/admin/dashboard' : '/student/dashboard'}
               style={styles.navLink}
             >
               Dashboard
             </Link>
-            
+
             {isAdmin && (
               <>
                 <Link to="/admin/classes" style={styles.navLink}>
@@ -57,7 +57,16 @@ const Navbar = () => {
               <span style={styles.userRole}>{user.role}</span>
             </div>
 
-            <button onClick={handleLogout} className="btn btn-outline" style={styles.logoutBtn}>
+            <button onClick={handleLogout} style={styles.logoutBtn}
+              onMouseEnter={(e) => {
+                e.target.style.background = '#aabfc5ff';
+                e.target.style.color = 'white';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'white';
+                e.target.style.color = '#aabfc5ff';
+              }}
+            >
               Logout
             </button>
           </div>
@@ -116,8 +125,16 @@ const styles = {
     textTransform: 'capitalize'
   },
   logoutBtn: {
+    background: 'white',
+    color: '#4f46e5',
+    border: '2px solid #4f46e5',
+    borderRadius: '8px',
+    padding: '8px 16px',
     fontSize: '14px',
-    padding: '8px 16px'
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    marginLeft: '16px'
   }
 };
 

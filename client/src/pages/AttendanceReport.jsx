@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import attendanceService from '../services/attendanceService';
 
 const AttendanceReport = () => {
   const [report, setReport] = useState([]);
@@ -13,11 +14,11 @@ const AttendanceReport = () => {
     const fetchAttendance = async () => {
       try {
         setLoading(true);
-        // Ensure this endpoint matches your Node.js backend route
-        const { data } = await axios.get('/api/attendance/report', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setReport(data);
+        const data = await attendanceService.getStudentAttendance();
+        
+        // The backend returns { attendance: [...], statistics: {...} }
+        // We only want the attendance array for the report table
+        setReport(data.attendance || []);
         setError(null);
       } catch (err) {
         console.error('Error fetching report:', err);
@@ -44,7 +45,7 @@ const AttendanceReport = () => {
           <thead className="bg-gray-100">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subject</th>
             </tr>
@@ -54,17 +55,17 @@ const AttendanceReport = () => {
               report.map((record) => (
                 <tr key={record._id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {new Date(record.date).toLocaleDateString()}
+                    {new Date(record.markedAt || record.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{record.studentName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{record.class?.className || 'N/A'}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 rounded-full text-xs ${
-                      record.status === 'Present' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      record.status === 'present' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }`}>
                       {record.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{record.subject}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{record.class?.subject || 'N/A'}</td>
                 </tr>
               ))
             ) : (

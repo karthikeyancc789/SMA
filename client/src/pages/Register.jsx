@@ -12,7 +12,8 @@ function Register() {
     password: '',
     department: '',
     year: '',
-    role: 'student'
+    role: 'student',
+    rollNumber: ''
   });
 
   const [error, setError] = useState('');
@@ -102,48 +103,7 @@ function Register() {
                 required
               />
             </div>
-            
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Password</label>
-              <input
-                type="password"
-                name="password"
-                style={styles.input}
-                placeholder="Create a password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Department</label>
-              <input
-                type="text"
-                name="department"
-                style={styles.input}
-                placeholder="e.g., Computer Science"
-                value={formData.department}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Year (1-4)</label>
-              <input
-                type="number"
-                name="year"
-                style={styles.input}
-                placeholder="Enter year (1-4)"
-                min="1"
-                max="4"
-                value={formData.year}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            
+
             <div style={styles.formGroup}>
               <label style={styles.label}>Role</label>
               <select 
@@ -155,6 +115,68 @@ function Register() {
                 <option value="student">Student</option>
                 <option value="admin">Admin</option>
               </select>
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>
+                {formData.role === 'admin' ? 'Teacher No' : 'Register No'}
+              </label>
+              <input
+                type="text"
+                name="rollNumber"
+                style={styles.input}
+                placeholder={formData.role === 'admin' ? 'Enter teacher number' : 'Enter register number'}
+                value={formData.rollNumber}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Department</label>
+              <select
+                name="department"
+                style={styles.input}
+                value={formData.department}
+                onChange={handleChange}
+                required
+              >
+                <option value="" disabled>Select your department</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="Physics">Physics</option>
+                <option value="Humanities">Humanities</option>
+              </select>
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label}>
+                {formData.role === 'admin' ? 'Teaching Experience (in yrs)' : 'Year (1-4)'}
+              </label>
+              <input
+                type="number"
+                name="year"
+                style={styles.input}
+                placeholder={formData.role === 'admin' ? 'Enter teaching experience' : 'Enter year (1-4)'}
+                min="1"
+                max={formData.role === 'admin' ? '50' : '4'}
+                value={formData.year}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Password</label>
+              <input
+                type="password"
+                name="password"
+                style={styles.input}
+                placeholder="Create a password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
             </div>
             
             <button 
